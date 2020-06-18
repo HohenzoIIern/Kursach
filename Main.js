@@ -17,7 +17,7 @@ function squareSums(n) {
     for (let i = 0; i <= n; i++) {
       matrix.push([]);
       for (let j = 0; j <= n; j++) {
-        ((squares.has(i + j)) && i !== j && j !== 0 && i !== 0) ? matrix[i].push(1) : matrix[i].push(0);
+        matrix[i].push((squares.has(i + j)) && i !== j);
       }
     }
     return matrix;
