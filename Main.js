@@ -266,7 +266,7 @@ function squareSums(n) {
 
   return hamiltonianPath(createAdjMatrix(n));
 }
-const result = squareSums(26);
+const result = squareSums(15);
 console.log(result);
 console.log(result.length);
 const end = new Date();
