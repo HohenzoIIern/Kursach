@@ -60,7 +60,6 @@ function squareSums(n) {
   }
 
   function part2(m, path) {
-    let quit = false;
     while (true) {
       const length = path.length;
       let inlet = -1;
@@ -120,7 +119,7 @@ function squareSums(n) {
       if (length < path.length) {
         path = part1(m, path);
       } else {
-        break
+        break;
       }
     }
     return path;
