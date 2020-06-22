@@ -14,10 +14,10 @@ function squareSums(n) {
 
   function createAdjMatrix(n) {
     const matrix = [];
-    for (let i = 0; i <= n; i++) {
+    for (let i = 0; i < n; i++) {
       matrix.push([]);
-      for (let j = 0; j <= n; j++) {
-        matrix[i].push((squares.has(i + j)) && i !== j);
+      for (let j = 0; j < n; j++) {
+        matrix[i].push(squares.has(i + j + 2) && i !== j);
       }
     }
     return matrix;
@@ -27,10 +27,10 @@ function squareSums(n) {
     let present = path[path.length - 1];
     const extended = [...path];
     const visited = new Set(extended);
-    for (let k = 0; k <= m.length; k++) {
+    for (let k = 0; k < m.length; k++) {
       const neighbor = [];
-      for (let i = 0; i <= m.length; i++) {
-        if (m[present][i] === 1 && !visited.has(i)) {
+      for (let i = 0; i < m.length; i++) {
+        if (m[present][i] && !visited.has(i)) {
           neighbor.push(i);
         }
       }
@@ -42,7 +42,7 @@ function squareSums(n) {
       for (let i = 0; i < neighbor.length; i++) {
         const next = [];
         for (let j = 0; j < m.length; j++) {
-          if (m[neighbor[i]][j] === 1 && !visited.has(j)) {
+          if (m[neighbor[i]][j] && !visited.has(j)) {
             next.push(j);
           }
           const eta = next.length;
@@ -61,13 +61,13 @@ function squareSums(n) {
 
   function part2(m, path) {
     let quit = false;
-    while (quit !== true) {
+    while (true) {
       const length = path.length;
       let inlet = -1;
       let outlet = -1;
       const neighbor = [];
       for (let i = 0; i < path.length; i++) {
-        if (m[path[length - 1]][path[i]] === 1) {
+        if (m[path[length - 1]][path[i]]) {
           neighbor.push(i);
         }
       }
@@ -83,14 +83,14 @@ function squareSums(n) {
           unvisited.push(i);
         }
       }
-      if (unvisited.length !== 0 && neighbor.length !== 0) {
+      if (unvisited.length > 0 && neighbor.length > 0) {
         let maximum = 0;
         for (let i = 0; i < neighbor.length; i++) {
           for (let j = 0; j < unvisited.length; j++) {
-            if (m[path[neighbor[i] + 1]][unvisited[j]] === 1) {
+            if (m[path[neighbor[i] + 1]][unvisited[j]]) {
               const next = [];
               for (let k = 0; k < unvisited.length; k++) {
-                if (m[unvisited[j]][unvisited[k]] === 1) {
+                if (m[unvisited[j]][unvisited[k]]) {
                   next.push(unvisited[k]);
                 }
               }
@@ -114,13 +114,13 @@ function squareSums(n) {
         }
         extended.push(outlet);
       }
-      if (extended.length !== 0) {
+      if (extended.length > 0) {
         path = extended;
       }
       if (length < path.length) {
         path = part1(m, path);
       } else {
-        quit = true;
+        break
       }
     }
     return path;
@@ -131,7 +131,7 @@ function squareSums(n) {
       let extended = [];
       const length = path.length;
       const unvisited = [];
-      for (let i = 1; i <= n; i++) {
+      for (let i = 0; i < n; i++) {
         let outside = true;
         for (let j = 0; j < path.length; j++) {
           if (i === path[j]) {
@@ -143,12 +143,12 @@ function squareSums(n) {
       let mainCheck = true;
       for (let i = 0; i < path.length; i++) {
         for (let j = 0; j < unvisited.length; j++) {
-          if (m[unvisited[j]][path[i]] === 1) {
+          if (m[unvisited[j]][path[i]]) {
             const temp = [];
             temp.push(unvisited[j]);
             let tempExtended = [];
             const tempVisited = [];
-            for (let l = 1; l <= n; l++) {
+            for (let l = 0; l < n; l++) {
               tempVisited.push(0);
             }
             let present;
@@ -157,16 +157,16 @@ function squareSums(n) {
               tempVisited[present] = 1;
               tempExtended.push(present);
             }
-            for (let l = 1; l <= n; l++) {
+            for (let l = 0; l < n; l++) {
               let missing = true;
               for (let k = 0; k < unvisited.length; k++)
                 if (l === unvisited[k]) missing = false;
               if (missing === true) tempVisited[l] = 1;
             }
-            for (let l = 1; l <= n; l++) {
+            for (let l = 0; l < n; l++) {
               const neighbor = [];
-              for (let l = 1; l <= n; l++) {
-                if (m[present][l] === 1 && tempVisited[l] === 0) {
+              for (let l = 0; l < n; l++) {
+                if (m[present][l] && tempVisited[l] === 0) {
                   neighbor.push(l);
                 }
               }
@@ -175,8 +175,8 @@ function squareSums(n) {
                 let minimum = n + 1;
                 for (let l = 0; l < neighbor.length; l++) {
                   const next = [];
-                  for (let k = 1; k <= n; k++)
-                    if (m[neighbor[l]][k] === 1 && tempVisited[k] === 0) {
+                  for (let k = 0; k < n; k++)
+                    if (m[neighbor[l]][k] && tempVisited[k] === 0) {
                       next.push(k);
                     }
                   const eta = next.length;
@@ -195,7 +195,7 @@ function squareSums(n) {
             let check = true;
             while (check && tempExtended.length !== 0) {
               for (let p = path.length - 2; p > i; p--) {
-                if (m[path[p]][last] === 1 && m[path[i + 1]][path[p + 1]] === 1) {
+                if (m[path[p]][last] && m[path[i + 1]][path[p + 1]]) {
                   check = false;
                   vj = p;
                   break;
@@ -248,7 +248,7 @@ function squareSums(n) {
   }
 
   function hamiltonianPath(m) {
-    for (let i = 1; i <= n; i++) {
+    for (let i = 0; i < n; i++) {
       let path = [i];
       path = part2(m, part1(m, path));
       if (path.length < n) {
@@ -258,6 +258,7 @@ function squareSums(n) {
         path = part2c(m, path);
       }
       if (path.length === n) {
+        path = path.map(x => ++x);
         return path;
       }
     }
@@ -266,7 +267,8 @@ function squareSums(n) {
 
   return hamiltonianPath(createAdjMatrix(n));
 }
-const result = squareSums(15);
+
+const result = squareSums(26);
 console.log(result);
 console.log(result.length);
 const end = new Date();
