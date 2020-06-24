@@ -3,16 +3,15 @@
 const start = new Date();
 
 function squareSums(n) {
-  const numberSet = new Set();
-  const squares = new Set();
-  for (let i = 1; i * i < 2 * n; i++) {
-    squares.add(i * i);
-  }
-  for (let i = 1; i <= n; i++) {
-    numberSet.add(i);
-  }
-
   function createAdjMatrix(n) {
+    const numberSet = new Set();
+    const squares = new Set();
+    for (let i = 1; i * i < 2 * n; i++) {
+      squares.add(i * i);
+    }
+    for (let i = 1; i <= n; i++) {
+      numberSet.add(i);
+    }
     const matrix = [];
     for (let i = 0; i < n; i++) {
       matrix.push([]);
@@ -21,6 +20,22 @@ function squareSums(n) {
       }
     }
     return matrix;
+  }
+
+  function unvisitedList(m, path) {
+    const unvisited = [];
+    for (let i = 0; i < m.length; i++) {
+      let outside = true;
+      for (let j = 0; j < path.length; j++) {
+        if (path[j] === i) {
+          outside = false;
+        }
+      }
+      if (outside) {
+        unvisited.push(i);
+      }
+    }
+    return unvisited;
   }
 
   function firstProcedure(m, path) {
@@ -61,27 +76,15 @@ function squareSums(n) {
 
   function secondProcedure(m, path) {
     while (true) {
-      const length = path.length;
       let inlet = -1;
       let outlet = -1;
       const neighbor = [];
       for (let i = 0; i < path.length; i++) {
-        if (m[path[length - 1]][path[i]]) {
+        if (m[path[path.length - 1]][path[i]]) {
           neighbor.push(i);
         }
       }
-      const unvisited = [];
-      for (let i = 0; i < m.length; i++) {
-        let outside = true;
-        for (let j = 0; j < path.length; j++) {
-          if (path[j] === i) {
-            outside = false;
-          }
-        }
-        if (outside) {
-          unvisited.push(i);
-        }
-      }
+      const unvisited = unvisitedList(m, path);
       if (unvisited.length > 0 && neighbor.length > 0) {
         let maximum = 0;
         for (let i = 0; i < neighbor.length; i++) {
@@ -113,14 +116,12 @@ function squareSums(n) {
         }
         extended.push(outlet);
       }
-      if (extended.length > 0) {
+      if (extended.length > 0 && path.length !== extended.length) {
         path = extended;
-      }
-      if (length < path.length) {
-        path = firstProcedure(m, path);
       } else {
         break;
       }
+      path = firstProcedure(m, path);
     }
     return path;
   }
@@ -129,110 +130,80 @@ function squareSums(n) {
     while (true) {
       let extended = [];
       const length = path.length;
-      const unvisited = [];
-      for (let i = 0; i < n; i++) {
-        let outside = true;
-        for (let j = 0; j < path.length; j++) {
-          if (i === path[j]) {
-            outside = false;
-          }
-        }
-        if (outside === true) {
-          unvisited.push(i);
-        }
-      }
+      const unvisited = unvisitedList(m, path);
       let mainCheck = true;
       for (let i = 0; i < path.length; i++) {
         for (let j = 0; j < unvisited.length; j++) {
-          if (m[unvisited[j]][path[i]]) {
-            const temp = [];
-            temp.push(unvisited[j]);
-            let tempExtended = [];
-            const tempVisited = [];
+          if (!m[unvisited[j]][path[i]]) {
+            continue;
+          }
+          const temp = [unvisited[j]];
+          let tempExtended = [unvisited[j]];//[unvisited[j]
+          const tempVisited = new Set(unvisitedList(m, unvisited));
+          tempVisited.add([unvisited[j]]);
+          let present = temp[0];
+          for (let l = 0; l < n; l++) {
+            const neighbor = [];
             for (let l = 0; l < n; l++) {
-              tempVisited.push(0);
+              if (m[present][l] && !tempVisited.has(l)) {
+                neighbor.push(l);
+              }
             }
-            let present;
-            for (let l = 0; l < temp.length; l++) {
-              present = temp[l];
-              tempVisited[present] = 1;
+            if (neighbor.length !== 0) {
+              let choice = neighbor[0];
+              let minimum = n + 1;
+              for (let l = 0; l < neighbor.length; l++) {
+                const next = [];
+                for (let k = 0; k < n; k++) {
+                  if (m[neighbor[l]][k] && !tempVisited.has(k)) {
+                    next.push(k);
+                  }
+                }
+                const eta = next.length;
+                if (eta < minimum) {
+                  choice = neighbor[l];
+                  minimum = eta;
+                }
+              }
+              present = choice;
+              tempVisited.add(present);
               tempExtended.push(present);
+            } else {
+              break;
             }
-            for (let l = 0; l < n; l++) {
-              let missing = true;
-              for (let k = 0; k < unvisited.length; k++) {
-                if (l === unvisited[k]) {
-                  missing = false;
-                }
-              }
-              if (missing) {
-                tempVisited[l] = 1;
-              }
-            }
-            for (let l = 0; l < n; l++) {
-              const neighbor = [];
-              for (let l = 0; l < n; l++) {
-                if (m[present][l] && tempVisited[l] === 0) {
-                  neighbor.push(l);
-                }
-              }
-              if (neighbor.length !== 0) {
-                let choice = neighbor[0];
-                let minimum = n + 1;
-                for (let l = 0; l < neighbor.length; l++) {
-                  const next = [];
-                  for (let k = 0; k < n; k++) {
-                    if (m[neighbor[l]][k] && tempVisited[k] === 0) {
-                      next.push(k);
-                    }
-                  }
-                  const eta = next.length;
-                  if (eta < minimum) {
-                    choice = neighbor[l];
-                    minimum = eta;
-                  }
-                }
-                present = choice;
-                tempVisited[present] = 1;
-                tempExtended.push(present);
-              } else {
+          }
+          let last = tempExtended[tempExtended.length - 1];
+          let vj;
+          let check = true;
+          while (check && tempExtended.length > 0) {
+            for (let p = path.length - 2; p > i; p--) {
+              if (m[path[p]][last] && m[path[i + 1]][path[p + 1]]) {
+                check = false;
+                vj = p;
                 break;
               }
             }
-            let last = tempExtended[tempExtended.length - 1];
-            let vj;
-            let check = true;
-            while (check && tempExtended.length > 0) {
-              for (let p = path.length - 2; p > i; p--) {
-                if (m[path[p]][last] && m[path[i + 1]][path[p + 1]]) {
-                  check = false;
-                  vj = p;
-                  break;
-                }
-              }
-              if (check) {
-                tempExtended.pop();
-                last = tempExtended[tempExtended.length - 1];
-              }
+            if (check) {
+              last = tempExtended.pop();
             }
-            if (!check) {
-              const temp = [];
-              for (let p = 0; p <= i; p++) {
-                temp.push(path[p]);
-              }
-              for (let p = 0; p < tempExtended.length; p++) {
-                temp.push(tempExtended[p]);
-              }
-              for (let p = vj; p > i; p--) {
-                temp.push(path[p]);
-              }
-              for (let p = vj + 1; p < path.length; p++) {
-                temp.push(path[p]);
-              }
-              tempExtended = temp;
-              mainCheck = false;
-              extended = tempExtended;
+          }
+          if (!check) {
+            const temp = [];
+            for (let p = 0; p <= i; p++) {
+              temp.push(path[p]);
             }
+            for (let p = 0; p < tempExtended.length; p++) {
+              temp.push(tempExtended[p]);
+            }
+            for (let p = vj; p > i; p--) {
+              temp.push(path[p]);
+            }
+            for (let p = vj + 1; p < path.length; p++) {
+              temp.push(path[p]);
+            }
+            tempExtended = temp;
+            mainCheck = false;
+            extended = tempExtended;
           }
         }
         if (!mainCheck) {
@@ -250,21 +221,12 @@ function squareSums(n) {
     return path;
   }
 
-  function reverseProcedure(m, path) {
-    let reversed = path.reverse();
-    reversed = extraProcedure(m, reversed);
-    return reversed;
-  }
-
   function hamiltonianPath(m) {
     for (let i = 0; i < n; i++) {
       let path = [i];
-      path = secondProcedure(m, firstProcedure(m, path));
+      path = extraProcedure(m, secondProcedure(m, firstProcedure(m, path)));
       if (path.length < n) {
-        path = extraProcedure(m, path);
-      }
-      if (path.length < n) {
-        path = reverseProcedure(m, path);
+        path = extraProcedure(m, path.reverse());
       }
       if (path.length === n) {
         path = path.map(x => ++x);
@@ -277,7 +239,7 @@ function squareSums(n) {
   return hamiltonianPath(createAdjMatrix(n));
 }
 
-const result = squareSums(26);
+const result = squareSums(29);
 console.log(result);
 console.log(result.length);
 const end = new Date();
