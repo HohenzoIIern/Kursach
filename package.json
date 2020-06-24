@@ -1,0 +1,30 @@
+{
+  "name": "kursach",
+  "version": "1.0.0",
+  "description": "Square sums solution",
+  "main": "Main.js",
+  "dependencies": {
+    "package.json": "^2.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HohenzoIIern/Kursach.git"
+  },
+  "keywords": [
+    "Hamiltonian",
+    "path",
+    "Square",
+    "sums",
+    "problem"
+  ],
+  "author": "HohenzoIIern",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HohenzoIIern/Kursach/issues"
+  },
+  "homepage": "https://github.com/HohenzoIIern/Kursach#readme"
+}
