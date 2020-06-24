@@ -23,7 +23,7 @@ function squareSums(n) {
     return matrix;
   }
 
-  function part1(m, path) {
+  function firstProcedure(m, path) {
     let present = path[path.length - 1];
     const extended = [...path];
     const visited = new Set(extended);
@@ -59,7 +59,7 @@ function squareSums(n) {
     return extended;
   }
 
-  function part2(m, path) {
+  function secondProcedure(m, path) {
     while (true) {
       const length = path.length;
       let inlet = -1;
@@ -78,7 +78,7 @@ function squareSums(n) {
             outside = false;
           }
         }
-        if (outside === true) {
+        if (outside) {
           unvisited.push(i);
         }
       }
@@ -117,7 +117,7 @@ function squareSums(n) {
         path = extended;
       }
       if (length < path.length) {
-        path = part1(m, path);
+        path = firstProcedure(m, path);
       } else {
         break;
       }
@@ -125,7 +125,7 @@ function squareSums(n) {
     return path;
   }
 
-  function part2b(m, path) {
+  function extraProcedure(m, path) {
     while (true) {
       let extended = [];
       const length = path.length;
@@ -137,7 +137,9 @@ function squareSums(n) {
             outside = false;
           }
         }
-        if (outside === true) unvisited.push(i);
+        if (outside === true) {
+          unvisited.push(i);
+        }
       }
       let mainCheck = true;
       for (let i = 0; i < path.length; i++) {
@@ -158,9 +160,14 @@ function squareSums(n) {
             }
             for (let l = 0; l < n; l++) {
               let missing = true;
-              for (let k = 0; k < unvisited.length; k++)
-                if (l === unvisited[k]) missing = false;
-              if (missing === true) tempVisited[l] = 1;
+              for (let k = 0; k < unvisited.length; k++) {
+                if (l === unvisited[k]) {
+                  missing = false;
+                }
+              }
+              if (missing) {
+                tempVisited[l] = 1;
+              }
             }
             for (let l = 0; l < n; l++) {
               const neighbor = [];
@@ -174,10 +181,11 @@ function squareSums(n) {
                 let minimum = n + 1;
                 for (let l = 0; l < neighbor.length; l++) {
                   const next = [];
-                  for (let k = 0; k < n; k++)
+                  for (let k = 0; k < n; k++) {
                     if (m[neighbor[l]][k] && tempVisited[k] === 0) {
                       next.push(k);
                     }
+                  }
                   const eta = next.length;
                   if (eta < minimum) {
                     choice = neighbor[l];
@@ -187,12 +195,14 @@ function squareSums(n) {
                 present = choice;
                 tempVisited[present] = 1;
                 tempExtended.push(present);
-              } else break;
+              } else {
+                break;
+              }
             }
             let last = tempExtended[tempExtended.length - 1];
             let vj;
             let check = true;
-            while (check && tempExtended.length !== 0) {
+            while (check && tempExtended.length > 0) {
               for (let p = path.length - 2; p > i; p--) {
                 if (m[path[p]][last] && m[path[i + 1]][path[p + 1]]) {
                   check = false;
@@ -229,10 +239,10 @@ function squareSums(n) {
           break;
         }
       }
-      if (extended.length !== 0) {
+      if (extended.length > 0) {
         path = extended;
       }
-      path = part2(m, part1(m, path));
+      path = secondProcedure(m, firstProcedure(m, path));
       if (length === path.length) {
         break;
       }
@@ -240,21 +250,21 @@ function squareSums(n) {
     return path;
   }
 
-  function part2c(m, path) {
+  function reverseProcedure(m, path) {
     let reversed = path.reverse();
-    reversed = part2b(m, reversed);
+    reversed = extraProcedure(m, reversed);
     return reversed;
   }
 
   function hamiltonianPath(m) {
     for (let i = 0; i < n; i++) {
       let path = [i];
-      path = part2(m, part1(m, path));
+      path = secondProcedure(m, firstProcedure(m, path));
       if (path.length < n) {
-        path = part2b(m, path);
+        path = extraProcedure(m, path);
       }
       if (path.length < n) {
-        path = part2c(m, path);
+        path = reverseProcedure(m, path);
       }
       if (path.length === n) {
         path = path.map(x => ++x);
